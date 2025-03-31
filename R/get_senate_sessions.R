@@ -23,6 +23,7 @@
 #' The `session` column is type factor, with the following levels:
 #' ```{r session levels}
 #' levels(get_senate_sessions()$session)
+#' # Note: That's a letter S, not a number 5!
 #' ```
 #'
 #' The Senate has had just 2 sessions in each Congress since 1941, so if you
@@ -31,7 +32,7 @@
 #' be dealing with special sessions (denoted `"S"`), not just numbered
 #' sessions.
 #'
-#' @returns A [tibble()] with the `begin_date` and `adjourn_date` of each
+#' @returns A tibble with the `begin_date` and `adjourn_date` of each
 #'  session of the Senate.
 #' @export
 #'
@@ -56,7 +57,7 @@ get_senate_sessions <- function() {
   # remove footnotes and newline characters from dates
   session_dates |>
     dplyr::mutate(dplyr::across(
-      .cols = tidyselect::ends_with("_date"),
+      .cols = dplyr::ends_with("_date"),
       .fns = function(.x) {
         stringr::str_remove_all(.x,
                                 pattern = paste("(?<=[:digit:]{4})[:digit:]*[:space:]",
@@ -64,13 +65,13 @@ get_senate_sessions <- function() {
                                                 "\\n", sep = "|"))
       })) |>
     # split each session into its own row
-    tidyr::separate_longer_delim(cols = tidyselect::ends_with("_date"),
+    tidyr::separate_longer_delim(cols = dplyr::ends_with("_date"),
                                  delim = stringr::regex("(?<=[:digit:]{4})(?=[:alpha:])")) |>
     dplyr::mutate(session = stringr::str_split_1(dplyr::first(.data$session), ""),
                   .by = "congress") |>
     # fix column types
     dplyr::mutate(congress = as.integer(.data$congress),
                   session = as.factor(.data$session),
-                  dplyr::across(tidyselect::ends_with("_date"),
+                  dplyr::across(dplyr::ends_with("_date"),
                                 ~ as.Date(.x, format = "%b %d, %Y")))
 }

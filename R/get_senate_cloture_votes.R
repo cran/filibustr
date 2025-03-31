@@ -7,7 +7,7 @@
 #' The data is sourced from the official Senate website, specifically
 #' <https://www.senate.gov/legislative/cloture/clotureCounts.htm>.
 #'
-#' @returns A [tibble()] with the number of cloture motions, cloture votes, and
+#' @returns A tibble with the number of cloture motions, cloture votes, and
 #'  successful cloture votes in each Congress.
 #' @export
 #'
@@ -21,5 +21,5 @@ get_senate_cloture_votes <- function() {
     # remove "Total" row
     dplyr::slice_head(n = -1) |>
     # fix data types
-    dplyr::mutate(dplyr::across(!tidyselect::any_of("years"), as.integer))
+    dplyr::mutate(dplyr::across(!dplyr::any_of("years"), as.integer))
 }

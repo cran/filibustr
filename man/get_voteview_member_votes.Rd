@@ -4,36 +4,31 @@
 \alias{get_voteview_member_votes}
 \title{Get data on the votes of individual members of Congress}
 \usage{
-get_voteview_member_votes(
-  chamber = "all",
-  congress = NULL,
-  local = TRUE,
-  local_dir = "."
-)
+get_voteview_member_votes(chamber = "all", congress = NULL, local_path = NULL)
 }
 \arguments{
 \item{chamber}{Which chamber to get data for. Options are:
 \itemize{
-\item \code{"all"}, \code{"congress"}: Both House and Senate data (the default).
+\item \code{"all"}, \code{"congress"}, \code{"hs"}: Both House and Senate data (the default).
 \item \code{"house"}, \code{"h"}, \code{"hr"}: House data only.
 \item \code{"senate"}, \code{"s"}, \code{"sen"}: Senate data only.
-These options are case-insensitive. If you explicitly pass a different value,
-it will default to "all" with a warning.
-}}
+}
 
-\item{congress}{A whole number (to get data for a single Congress), or
+These options are case-insensitive. If you explicitly pass a different value,
+it will default to "all" with a warning.}
+
+\item{congress}{(Optional) A whole number (to get data for a single Congress), or
 a numeric vector (to get data for a set of congresses).
-Optional; will retrieve data for all Congresses by default.
+
+If not provided, will retrieve data for all Congresses by default.
 If specified, Congress numbers cannot be greater than the \code{\link[=current_congress]{current_congress()}}
 (i.e., you cannot try to get future data).}
 
-\item{local}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}} Whether to read the data from a local file, as opposed to the Voteview website. Default is \code{TRUE}. If the local file does not exist, will fall back to reading from online.}
-
-\item{local_dir}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}} The directory containing
-the local file. Defaults to the working directory.}
+\item{local_path}{(Optional) A file path for reading from a local file. If no
+\code{local_path} is specified, will read data from the Voteview website.}
 }
 \value{
-A \code{\link[=tibble]{tibble()}}.
+A tibble.
 }
 \description{
 \code{get_voteview_member_votes()} returns a tibble that lists how each member
@@ -48,15 +43,12 @@ See the
 Please cite this dataset as:
 
 Lewis, Jeffrey B., Keith Poole, Howard Rosenthal, Adam Boche, Aaron Rudkin,
-and Luke Sonnet (2023). \emph{Voteview: Congressional Roll-Call Votes Database}.
-\url{https://voteview.com/}
+and Luke Sonnet (2025).
+\emph{Voteview: Congressional Roll-Call Votes Database}. \url{https://voteview.com/}
 }
 \examples{
 \dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 get_voteview_member_votes()
-
-# Force to get data from Voteview website
-get_voteview_member_votes(local = FALSE)
 
 # Get data for only one chamber
 get_voteview_member_votes(chamber = "house")
@@ -69,4 +61,8 @@ get_voteview_member_votes(congress = current_congress())
 # Get data for a set of Congresses
 get_voteview_member_votes(congress = 1:3)
 
+}
+\seealso{
+\code{\link[=get_voteview_cast_codes]{get_voteview_cast_codes()}} for a dictionary of
+the cast codes in this data.
 }

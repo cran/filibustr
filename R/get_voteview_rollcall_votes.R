@@ -3,24 +3,21 @@
 #' `get_voteview_rollcall_votes()` returns a tibble with information on recorded
 #' (roll call) votes in the House and Senate.
 #'
-#' @inheritParams get_voteview_members
-#' @inherit get_voteview_members details
+#' @inherit get_voteview_members
 #'
 #' @param chamber Which chamber to get data for. Options are:
-#'  * `"all"`, `"congress"`: Both House and Senate data (the default).
+#'  * `"all"`, `"congress"`, `"hs"`: Both House and Senate data (the default).
 #'  * `"house"`, `"h"`, `"hr"`: House data only.
 #'  * `"senate"`, `"s"`, `"sen"`: Senate data only.
+#'
 #'  These options are case-insensitive. If you explicitly pass a different value,
 #'  it will default to "all" with a warning.
 #'
-#' @returns A [tibble()].
+#' @returns A tibble.
 #' @export
 #'
 #' @examplesIf interactive()
 #' get_voteview_rollcall_votes()
-#'
-#' # Force to get data from Voteview website
-#' get_voteview_rollcall_votes(local = FALSE)
 #'
 #' # Get data for only one chamber
 #' # NOTE: the President is included in all data
@@ -36,27 +33,49 @@
 #' # Get data for a set of Congresses
 #' get_voteview_rollcall_votes(congress = 1:10)
 #'
-get_voteview_rollcall_votes <- function(chamber = "all", congress = NULL,
-                                        local = TRUE, local_dir = ".") {
+get_voteview_rollcall_votes <- function(chamber = "all", congress = NULL, local_path = NULL) {
   # join multiple congresses
-  if (length(congress) > 1 & is.numeric(congress)) {
-    list_of_dfs <- lapply(congress,
-                          function(.cong) get_voteview_rollcall_votes(local = local,
-                                                                      local_dir = local_dir,
-                                                                      chamber = chamber,
-                                                                      congress = .cong))
+  if (length(congress) > 1 && is.numeric(congress)) {
+    list_of_dfs <- lapply(congress, function(.cong) {
+      get_voteview_rollcall_votes(chamber = chamber,
+                                  congress = .cong,
+                                  local_path = local_path)
+    })
     return(dplyr::bind_rows(list_of_dfs))
   }
 
-  full_path <- build_file_path(data_source = "voteview", chamber = chamber, congress = congress,
-                               sheet_type = "rollcalls", local = local, local_dir = local_dir)
-
-  # request data from online
-  if (R.utils::isUrl(full_path)) {
-    full_path <- get_online_data(url = full_path, source_name = "Voteview")
+  if (is.null(local_path)) {
+    # online reading
+    url <- build_url(data_source = "voteview", chamber = chamber, congress = congress,
+                     sheet_type = "rollcalls")
+    online_file <- get_online_data(url = url, source_name = "Voteview")
+    df <- readr::read_csv(online_file, col_types = "ifiDddiidddddccccc")
+  } else {
+    # local reading
+    df <- read_local_file(path = local_path, col_types = "ifiDddiidddddccccc")
   }
 
-  readr::read_csv(full_path, col_types = "ifiDddiidddddccccc") |>
+  # fixes for coming from .dta files
+  if (isTRUE(tools::file_ext(local_path) == "dta")) {
+    df <- df |>
+      dplyr::mutate(dplyr::across(.cols = "chamber",
+                                  .fns = haven::as_factor),
+                    dplyr::across(.cols = c("congress", "rollnumber",
+                                            "yea_count", "nay_count"),
+                                  .fns = as.integer),
+                    # convert empty strings to NAs
+                    dplyr::across(.cols = dplyr::where(is.character),
+                                  .fns = \(str) dplyr::na_if(str, "")))
+  }
+
+  # filter local files
+  if (!is.null(local_path)) {
+    df <- df |>
+      filter_congress(congress = congress) |>
+      filter_chamber(chamber = chamber)
+  }
+
+  df |>
     dplyr::mutate(dplyr::across(.cols = c("session", "clerk_rollnumber"),
                                 .fns = as.integer))
 }
