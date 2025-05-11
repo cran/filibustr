@@ -32,14 +32,13 @@
 #' get_voteview_parties(congress = 1:10)
 #'
 get_voteview_parties <- function(chamber = "all", congress = NULL, local_path = NULL) {
-  # join multiple congresses
-  if (length(congress) > 1 && is.numeric(congress)) {
-    list_of_dfs <- lapply(congress, function(.cong) {
-      get_voteview_parties(chamber = chamber,
-                           congress = .cong,
-                           local_path = local_path)
-      })
-    return(dplyr::bind_rows(list_of_dfs))
+  # join multiple congresses (for online downloads)
+  if (length(congress) > 1 && is.numeric(congress) && is.null(local_path)) {
+    return(
+      multi_congress_read(fun = get_voteview_parties,
+                          chamber = chamber,
+                          congress = congress)
+    )
   }
 
   if (is.null(local_path)) {
