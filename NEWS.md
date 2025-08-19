@@ -1,3 +1,9 @@
+# filibustr 0.4.1 (2025-08-18)
+
+* Ensure web resources are online when running examples in function 
+  documentation (#36).
+* New suggested dependency: {curl}.
+
 # filibustr 0.4.0 (2025-05-11)
 
 ## New features

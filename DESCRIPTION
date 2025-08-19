@@ -1,6 +1,6 @@
 Package: filibustr
 Title: Data Utilities for Congressional Research
-Version: 0.4.0
+Version: 0.4.1
 Authors@R: 
     person("Max", "Feinleib", email = "mhfeinleib@gmail.com", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0009-0002-9604-3533"))
@@ -17,14 +17,14 @@ BugReports: https://github.com/feinleib/filibustr/issues
 Depends: R (>= 4.1.0)
 Imports: cli, dplyr, furrr, future, haven, httr2, lifecycle, purrr,
         readr, rlang, rvest, stringr, tidyr, tools
-Suggests: testthat (>= 3.0.0)
+Suggests: curl, testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Encoding: UTF-8
 RoxygenNote: 7.3.2
 NeedsCompilation: no
-Packaged: 2025-05-11 15:24:38 UTC; mhfeinleib
+Packaged: 2025-08-18 03:32:56 UTC; mhfeinleib
 Author: Max Feinleib [aut, cre, cph] (ORCID:
     <https://orcid.org/0009-0002-9604-3533>)
 Maintainer: Max Feinleib <mhfeinleib@gmail.com>
 Repository: CRAN
-Date/Publication: 2025-05-11 15:40:05 UTC
+Date/Publication: 2025-08-19 08:40:17 UTC
